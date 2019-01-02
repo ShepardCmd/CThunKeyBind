@@ -1,0 +1,6 @@
+## Interface: 80100
+## Title: C'Thun Key Bind
+## Author: Alexander Iglin
+## Version: 0.1
+
+main.lua
