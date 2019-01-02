@@ -1,6 +1,6 @@
 --
 -- C'Thun Key Bind - World of Warcraft Add'On for key binding.
--- Author: A. Iglin
+-- Author: Alexander Iglin (savinggalaxyforfood@gmail.com)
 --
 
 --message('C\'Thun calls!')
@@ -13,12 +13,38 @@
 --    print("You triggered the binding using", button)
 --end)
 
-local EventFrame = CreateFrame("Frame")
+SlashCmdList["CTHUN"] = function(msg)
+    ProcessInput(msg)
+end
+SLASH_CTHUN1 = "/cthun"
+
+function ProcessInput(msg)
+    ChatFrame1:AddMessage("You've entered: ".. msg)
+    msg = trim(msg)
+    local words = {}
+    for word in msg:gmatch("%w+") do
+        ChatFrame1:AddMessage("Word: ".. word)
+        table.insert(words, word)
+    end
+    local action_type = strupper(words[1])
+    local key = strupper(words[table.getn(key)])
+    local spell = strsub(msg, strlen(action_type) + 1, strlen(msg) - table.getn(key) - 1)
+    spell = trim(spell)
+end
+
+local EventFrame = CreateFrame("SayHelloFrame")
 EventFrame:RegisterEvent("PLAYER_LOGIN")
 EventFrame:SetScript("OnEvent", function(_, _, _)
     ChatFrame1:AddMessage("Hi, ".. UnitName("Player").. "! You can type \"/cthun\" to start binding abilities and macros on keys.")
 end)
 
+function saveBinding(action_type, spell, key)
+
+end
+
+function trim(s)
+    return string.gsub(s, "^%s*(.-)%s*$", "%1")
+end
 --local EventFrame = CreateFrame("Frame")
 --EventFrame:RegisterEvent("PLAYER_LOGIN")
 --EventFrame:SetScript("OnEvent", function(self,event,...)
