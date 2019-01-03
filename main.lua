@@ -54,6 +54,7 @@ local EventFrame = CreateFrame("Frame")
 EventFrame:RegisterEvent("PLAYER_LOGIN")
 EventFrame:SetScript("OnEvent", function(_, _, _)
     DEFAULT_CHAT_FRAME:AddMessage("Hi, ".. UnitName("Player").. "! You can type \"/cthun\" to start binding abilities and macros on keys.")
+    ListBars()
 end)
 
 function SaveBinding(action_type, spell_or_item_id, key)
@@ -78,7 +79,64 @@ function SaveBinding(action_type, spell_or_item_id, key)
     if (ok == 1) then
         DEFAULT_CHAT_FRAME:AddMessage("Binding failed, please, check your command!")
     else
-        DEFAULT_CHAT_FRAME:AddMessage("Binded sucessfully!")
+        DEFAULT_CHAT_FRAME:AddMessage("Binded successfully!")
+        UpdateActionBars(spell_or_item_id, key)
+        SaveBindings(CHARACTER_BINDINGS)
+    end
+end
+
+function UpdateActionBars(spell_or_item_id, key)
+    local bars={"Action","MultiBarBottomLeft","MultiBarBottomRight","MultiBarLeft","MultiBarRight"}
+    for bar=1,#bars do
+        for button=1,12 do
+            DEFAULT_CHAT_FRAME:AddMessage("Checking button ".. button);
+            local buttonName = bars[bar].."Button"..button
+            DEFAULT_CHAT_FRAME:AddMessage("buttonName=".. buttonName);
+            if (GetActionInfo(_G[buttonName].action)) then
+                DEFAULT_CHAT_FRAME:AddMessage("actionInfo=".. GetActionInfo(_G[buttonName].action));
+                local actionType, id, subType = GetActionInfo(_G[buttonName].action)
+                if id == spell_or_item_id then
+                    DEFAULT_CHAT_FRAME:AddMessage("Found item with id ".. id.. " in button ".. buttonName);
+                    local ok = SetBindingClick(key, buttonName);
+                end
+            end
+        end
+    end
+end
+
+function UpdateActionSlots(spell_or_item_id, key)
+    for slot = 1, 120 do
+        local actionType, id, subType = GetActionInfo(slot)
+        DEFAULT_CHAT_FRAME:AddMessage(actionType.. "; ".. id.. "; ".. subType);
+        if (id == spell_or_item_id) then
+            DEFAULT_CHAT_FRAME:AddMessage("Found item with id ".. id.. " in slot ".. slot);
+            --ok = SetBindingClick(key, "buttonName"[, "button"]);
+        end
+    end
+end
+
+function ListBars()
+    local bars={"Action","MultiBarBottomLeft","MultiBarBottomRight","MultiBarLeft","MultiBarRight"}
+    for bar=1,#bars do
+        for button=1,12 do
+            local buttonName = bars[bar].."Button"..button
+            print(buttonName,"contains",GetActionInfo(_G[buttonName].action))
+        end
+    end
+end
+
+function ReportActionButtons()
+    local lActionSlot = 0;
+    for lActionSlot = 1, 120 do
+        local lActionText = GetActionText(lActionSlot);
+        local lActionTexture = GetActionTexture(lActionSlot);
+        if lActionTexture then
+            local lMessage = "Slot " .. lActionSlot .. ": [" .. lActionTexture .. "]";
+            if lActionText then
+                lMessage = lMessage .. " \"" .. lActionText .. "\"";
+            end
+            DEFAULT_CHAT_FRAME:AddMessage(lMessage);
+        end
     end
 end
 
